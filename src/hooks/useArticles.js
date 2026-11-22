@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getAllArticles, getArticlesByCategory } from '../supabase/articlesService';
+import { getArticlesByCategory } from '../supabase/articlesService';
 
 /**
  * Custom React Hook for fetching articles

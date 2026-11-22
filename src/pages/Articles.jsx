@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useCategories } from '../hooks/useCategories';
 import { useArticles } from '../hooks/useArticles';
@@ -7,21 +7,13 @@ import ArticleCard from '../components/ArticleCard';
 const Articles = () => {
   const location = useLocation();
   const { categories, loading: categoriesLoading, error: categoriesError } = useCategories();
-  const [selectedCategory, setSelectedCategory] = useState('');
+  // The category the reader clicked. Until they click one, fall back to the
+  // category they came back from (ArticleDetail passes it in router state),
+  // then to the first category.
+  const [chosenCategory, setSelectedCategory] = useState(null);
+  const selectedCategory =
+    chosenCategory ?? location.state?.category ?? categories[0]?.id ?? '';
   const { articles, loading: articlesLoading, error: articlesError } = useArticles(selectedCategory);
-
-  // Set default category when categories load
-  useEffect(() => {
-    if (categories.length > 0 && !selectedCategory) {
-      // Check if returning from article detail with a category in state
-      const returnCategory = location.state?.category;
-      if (returnCategory) {
-        setSelectedCategory(returnCategory);
-      } else {
-        setSelectedCategory(categories[0].id);
-      }
-    }
-  }, [categories, selectedCategory, location.state]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-cream via-amber-50 to-orange-50 py-12 px-4">

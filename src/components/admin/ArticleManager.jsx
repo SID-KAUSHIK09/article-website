@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getAllArticles, createArticle, updateArticle, deleteArticle } from '../../supabase/articlesService';
 import { getAllCategories } from '../../supabase/categoriesService';
+import { isoToHindiDate, hindiDateToIso } from '../../utils/hindiDate';
 
 const ArticleManager = () => {
   const [articles, setArticles] = useState([]);
@@ -38,71 +39,6 @@ const ArticleManager = () => {
     }
   };
 
-  const convertDateToHindi = (dateString) => {
-    if (!dateString) return '';
-    
-    const monthsHindi = {
-      0: 'जनवरी',
-      1: 'फरवरी',
-      2: 'मार्च',
-      3: 'अप्रैल',
-      4: 'मई',
-      5: 'जून',
-      6: 'जुलाई',
-      7: 'अगस्त',
-      8: 'सितंबर',
-      9: 'अक्टूबर',
-      10: 'नवंबर',
-      11: 'दिसंबर'
-    };
-
-    const date = new Date(dateString);
-    const day = date.getDate();
-    const month = monthsHindi[date.getMonth()];
-    const year = date.getFullYear();
-
-    return `${day} ${month} ${year}`;
-  };
-
-  const convertHindiDateToISO = (hindiDate) => {
-    if (!hindiDate) return '';
-    
-    const monthsHindiToNumber = {
-      'जनवरी': 0,
-      'फरवरी': 1,
-      'मार्च': 2,
-      'अप्रैल': 3,
-      'मई': 4,
-      'जून': 5,
-      'जुलाई': 6,
-      'अगस्त': 7,
-      'सितंबर': 8,
-      'अक्टूबर': 9,
-      'नवंबर': 10,
-      'दिसंबर': 11
-    };
-
-    try {
-      // Parse "1 जनवरी 2026" format
-      const parts = hindiDate.split(' ');
-      if (parts.length !== 3) return '';
-      
-      const day = parseInt(parts[0]);
-      const monthIndex = monthsHindiToNumber[parts[1]];
-      const year = parseInt(parts[2]);
-      
-      if (isNaN(day) || monthIndex === undefined || isNaN(year)) return '';
-      
-      const date = new Date(year, monthIndex, day);
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const dayStr = String(date.getDate()).padStart(2, '0');
-      
-      return `${date.getFullYear()}-${month}-${dayStr}`;
-    } catch (e) {
-      return '';
-    }
-  };
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -111,7 +47,7 @@ const ArticleManager = () => {
   const handleDateChange = (e) => {
     const dateValue = e.target.value;
     setDatePickerValue(dateValue);
-    const hindiDate = convertDateToHindi(dateValue);
+    const hindiDate = isoToHindiDate(dateValue);
     setFormData(prev => ({ ...prev, date: hindiDate }));
   };
 
@@ -141,7 +77,7 @@ const ArticleManager = () => {
       date: article.date || '',
     });
     // Convert Hindi date back to ISO format for the date picker
-    const isoDate = convertHindiDateToISO(article.date);
+    const isoDate = hindiDateToIso(article.date);
     setDatePickerValue(isoDate);
     setShowForm(true);
     window.scrollTo(0, 0);
@@ -207,11 +143,12 @@ const ArticleManager = () => {
           </h3>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="article-title" className="block text-sm font-medium text-gray-700 mb-2">
                 Title *
               </label>
               <input
                 type="text"
+                id="article-title"
                 name="title"
                 value={formData.title}
                 onChange={handleInputChange}
@@ -221,10 +158,11 @@ const ArticleManager = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="article-category" className="block text-sm font-medium text-gray-700 mb-2">
                 Category *
               </label>
               <select
+                id="article-category"
                 name="category"
                 value={formData.category}
                 onChange={handleInputChange}
@@ -241,11 +179,12 @@ const ArticleManager = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="article-date" className="block text-sm font-medium text-gray-700 mb-2">
                 Date * (will be converted to Hindi)
               </label>
               <input
                 type="date"
+                id="article-date"
                 value={datePickerValue}
                 onChange={handleDateChange}
                 required
@@ -259,10 +198,11 @@ const ArticleManager = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="article-content" className="block text-sm font-medium text-gray-700 mb-2">
                 Content *
               </label>
               <textarea
+                id="article-content"
                 name="content"
                 value={formData.content}
                 onChange={handleInputChange}
