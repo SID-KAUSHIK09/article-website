@@ -8,7 +8,7 @@ const ArticleCard = ({ article, category }) => {
           {article.title}
         </h3>
         <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-          {article.content.substring(0, 120)}...
+          {(article.content ?? '').substring(0, 120)}...
         </p>
         <div className="flex justify-between items-center text-sm">
           <span className="text-warmBrown font-medium">{article.date}</span>
